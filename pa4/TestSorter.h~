@@ -1,0 +1,66 @@
+// Program Information ////////////////////////////////////////////////////////
+/**
+ * @file TestSorter.h
+ *
+ * @brief Definition file for TestSorter class
+ * 
+ * @author Alexandra Caceres
+ * 
+ * @details Specifies all member methods of the TestSorter
+ *
+ * @version 1.00 (20 September 2015)
+ *
+ * @Note Requires DateType.h
+ */
+
+// Precompiler directives /////////////////////////////////////////////////////
+
+
+#ifndef TESTSORTER_H
+#define TESTSORTER_H
+
+// Header files ///////////////////////////////////////////////////////////////
+
+#include "DateType.h"
+#include "SorterClass.h"
+#include "SorterClass.cpp"
+#include "SimpleVector.cpp"
+#include "SimpleVector.h"
+
+// Class definition  //////////////////////////////////////////////////////////
+
+class TestSorter: public SorterClass<DateType>
+    {
+        public:
+            
+            TestSorter();
+            TestSorter (int initial);
+            TestSorter (const TestSorter& copied);
+           
+            ~TestSorter();
+           
+            int compareTo( const DateType &lhObject, 
+                                                    const DateType &rhObject); 
+            
+            bool sort();
+            int getMonth(const char *date, int &index);
+            //int strtoInt();
+            //int isDateValid();
+           
+            
+            
+            // string functions
+            void strcopy(char* dest, char* src);
+            int strlength(char* string);
+            
+            
+        private:
+        
+      
+        bool strcomp (char* string1, char* string2);
+        SorterClass<DateType> sortData;
+};
+
+
+  #endif // ifndef TESTSORTER_H
+
