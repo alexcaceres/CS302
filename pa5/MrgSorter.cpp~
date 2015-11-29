@@ -1,0 +1,555 @@
+// Program Information ////////////////////////////////////////////////////////
+/**
+ * @file MrgSorter.cpp
+ * 
+ * @brief Implementation file for MrgSorter,
+ *        derived from SorterClass
+ * 
+ * @author Alexandra Caceres
+ *
+ * @details Implements virtual member methods of the MrgSorter
+ *
+ * @version 1.00 (27 September 2015)
+ *
+ * @Note Requires MrgSorter.h, SorterClass.cpp, SimpleVector.cpp,
+ * 
+ */
+
+// Precompiler directives /////////////////////////////////////////////////////
+
+#ifndef MRGSORTER_CPP
+#define MRGSORTER_CPP
+
+// Header files ///////////////////////////////////////////////////////////////
+
+#include "MrgSorter.h"
+#include "SorterClass.cpp"
+#include "SimpleVector.cpp"
+#include <iostream>
+
+/**
+ * @brief Default constructor
+ *
+ * @details Constructs sorter class with default vector class initialization
+ *          
+ * @param None
+ *
+ * @note None
+ */
+MrgSorter::MrgSorter 
+     (
+      // no parameters
+     )
+       : SorterClass<DateType>()
+   {
+    // construct parent
+   }
+
+/**
+ * @brief Initialization constructor
+ *
+ * @details Constructs sorter class with specified vector class initialization
+ *          
+ * @param in: initial capacity
+ *
+ * @note None
+ */
+MrgSorter::MrgSorter 
+     (
+      int initialCapacity 
+     )
+       : SorterClass<DateType>( initialCapacity )
+   {
+    // construct parent
+   }
+
+/**
+ * @brief Copy constructor
+ *
+ * @details Constructs sorter class with copied object
+ *          
+ * @param in: other SorterClass object
+ *
+ * @note None
+ */
+MrgSorter::MrgSorter
+     (
+      const SorterClass<DateType> &copiedSorter 
+     )
+       : SorterClass<DateType>( copiedSorter )
+   {
+    // construct parent
+   }
+
+/**
+ * @brief Class destructor
+ *
+ * @details Destructs test sorter class
+ *          
+ * @param in: None
+ *
+ * @note Implements SorterClass -> SimpleVector destructor
+ */
+MrgSorter::~MrgSorter
+     (
+      // no parameters
+     )
+   {
+    // parent class (SorterClass) destructs
+   }
+
+/**
+ * @brief Object comparison, necessary for sorting
+ *
+ * @details Compares objects mathematically, 
+ *          returns value < 0 if lhO < rhO
+ *          returns  0 if lhO = rhO
+ *          returns value > 0 if lhO > rhO
+ *          
+ * @param in: Left hand object, right hand object
+ *
+ * @note Simple mathematical base operation; assumed to be overridden
+ */
+int MrgSorter::compareTo 
+     (
+      const DateType &lhObject, // in: leftHandObject
+      const DateType &rhObject  // in: rightHandObject
+     )
+   {
+    int difference = makeYear( lhObject.date ) - makeYear( rhObject.date );
+
+    if( difference != 0 )
+       {
+        return difference;
+       }
+
+    difference = makeMonth( lhObject.date ) - makeMonth( rhObject.date );
+
+    if( difference != 0 )
+       {
+        return difference;
+       }
+
+    return makeDate( lhObject.date ) - makeDate( rhObject.date );
+   }
+
+/**
+ * @brief Sorting operation
+ *
+ * @details Virtual sort method that is overridden
+ *          to use various sorting strategies
+ *          
+ * @param in: None
+ *
+ * @note Derived methods use specific strategy to sort objects
+ * @note Sets sort success flag to true at start;
+ *       supporting operations used to create dates, months, years
+ *       will set the flag to false if there is an incorrect date;
+ *       method returns success flag
+ */
+bool MrgSorter::sort
+       (
+        // no parameters
+       )
+   {
+        int leftIndex = 0;
+        int rightIndex = getSize() - 1;
+        DateType *temp = new DateType[getSize()];
+        
+        sortSuccess = true;
+        for( int index = 0; index < getSize(); index++ )
+        {
+            this->getValueAt(index,temp[index]);
+        }
+
+        mergeSort( temp, leftIndex, rightIndex );
+
+        for( int index = 0; index < getSize(); index++ )
+        {
+            this->setValueAt(index,temp[index]);
+        }
+        
+        return sortSuccess;
+    
+ 
+    }
+/**
+ * @brief Merge Sorting operation
+ *
+ * @details This function uses recursion and calls merge sort as well as the merge function         
+ *          
+ * @param in: DateType array[] , int left, int right
+ *
+ * @note Derived methods use specific strategy to sort objects
+ * @note Sets sort success flag to true at start;
+ *       supporting operations used to create dates, months, years
+ *       will set the flag to false if there is an incorrect date;
+ *       method returns success flag
+ */
+void MrgSorter::mergeSort(DateType array[], int left, int right)
+{
+   
+     int mid;
+
+        if( left < right )
+        {
+            mid = ((left+right)/2);
+            mergeSort( array, left, mid );
+            mergeSort( array, mid+1, right );
+            merge( array, left, mid, right );
+        }
+
+}
+/**
+ * @brief Merges date types
+ *
+ * @details merges date types for use with some sorting algorithms
+ *          
+ * @param in: None
+ *
+ * @note Requires access of vector data, merging of strings,
+ *       and resetting vector data at locations
+ */
+void MrgSorter::merge(DateType array[], int low, int middle, int high)
+{
+
+ DateType temp[getSize()];
+        DateType lowObject, middleObject;
+        int firstIndex = low;             
+        int middleIndex = middle + 1;       
+        int lastIndex = low;
+        int index;             
+
+        for( index = low; index <= high; index++ )
+        {
+            temp[index] = array[index];
+        }
+
+        while( firstIndex <= middle && middleIndex <= high )
+        {
+            getValueAt(firstIndex, lowObject);
+            getValueAt(middleIndex, middleObject);
+            if( compareTo(temp[firstIndex],temp[middleIndex]) < 0 )
+            {
+                array[lastIndex] = temp[firstIndex];
+                firstIndex++;
+            }
+            else
+            {
+                array[lastIndex] = temp[middleIndex];
+                middleIndex++;
+            }
+            lastIndex++;
+        }
+
+        while( firstIndex <= middle )
+        {
+            array[lastIndex] = temp[firstIndex];
+            lastIndex++;
+            firstIndex++;
+        }
+    }
+   
+
+/**
+ * @brief Makes an integer date
+ *
+ * @details Creates integer date from the text at the first part of the string
+ *          
+ * @param in: String data
+ *
+ * @note Checks for legitimate dates, sets sort success flag to false
+ *       if date not possible
+ */
+int MrgSorter::makeDate
+       ( 
+        const char *str  // in: date string
+       )
+   {
+    int startIndex = 0;
+    int maxDate, date = strToInt( startIndex, str );
+
+    switch( makeMonth( str ) )
+       {
+        case 4: case 6: case 9: case 11:
+           maxDate = 30;
+           break;
+
+        case 2:
+           if( isLeapYear( makeYear( str ) ) )
+              {
+               maxDate = 29;
+              }
+           else
+              {
+               maxDate = 28;
+              }
+           break;
+
+        default:
+           maxDate = 31;
+           break;
+       }
+
+    if( date > 0 && date <= maxDate )
+       {
+        return date;
+       }
+
+    sortSuccess = false;
+
+    return 0;
+   }
+
+/**
+ * @brief Makes an integer month
+ *
+ * @details Creates integer month from the text in the middle of the string
+ *          
+ * @param in: String data
+ *
+ * @note Checks for legitimate months, sets sort success flag to false
+ *       if date not possible
+ */
+int MrgSorter::makeMonth
+       ( 
+        const char *str  // in: date string
+       )
+   {
+    const int NUM_MONTHS = 12;
+    int monthIndex, startIndex = 0;
+    char monthNames[ NUM_MONTHS ][ MONTH_NAME_SIZE ] = 
+             { "APR", "AUG", "DEC", "FEB", "MAR", "MAY", 
+                                  "JAN", "JUL", "JUN", "NOV", "OCT", "SEP" };
+    int monthNums[ NUM_MONTHS ] = { 4, 8, 12, 2, 3, 5, 1, 7, 6, 11, 10, 9 };
+
+    startIndex = findSpace( startIndex, str ) + 1;
+
+    for( monthIndex = 0; monthIndex < NUM_MONTHS; monthIndex++ )
+       {
+        if( compMonth( str, startIndex, monthNames[ monthIndex ] ) )
+           {
+            return monthNums[ monthIndex ];
+           }
+       }
+
+    sortSuccess = false;
+
+    return 0;
+   }
+
+/**
+ * @brief Makes an integer year
+ *
+ * @details Creates integer year from the text at the end of the string
+ *          
+ * @param in: String data
+ *
+ * @note Checks for legitimate years, sets sort success flag to false
+ *       if year is below zero or above arbitrarily set limit
+ *       in .h file
+ */
+int MrgSorter::makeYear
+       ( 
+        const char *str  // in: date string 
+       )
+   {
+    int startIndex = 0;
+    int year;
+
+    startIndex = findSpace( startIndex, str ) + 1;
+    startIndex = findSpace( startIndex, str ) + 1;
+
+    year = strToInt( startIndex, str );
+
+    if( year < 0 || year > MAX_YEAR_ALLOWED )
+       {
+        sortSuccess = false;
+
+        return 0;
+       }
+
+    return year;
+   }
+
+/**
+ * @brief Converts substring segment to integer
+ *
+ * @details Given index starting location, acquires all contiquous digits,
+ *          converts them to an integer value
+ *          
+ * @param in: starting index
+ * @param in: String data
+ *
+ * @note None
+ */
+int MrgSorter::strToInt
+       ( 
+        int bIndex,  // in: start index through string
+        const char *str  // in: string
+       )
+   {
+    int value, lFactor= 10;
+
+    value = int( str[ bIndex ] - '0' );
+
+    bIndex++;
+
+    while( isDigit( str[ bIndex ] ) )
+       {
+        value *= lFactor;
+
+        value += int( str[ bIndex ] - '0' );
+
+        bIndex++;
+       }
+
+    return value;
+   }
+
+/**
+ * @brief Finds the next space in a string
+ *
+ * @details Given a starting index, finds the next space in a string
+ *          in order to find the next date component
+ *          
+ * @param in: starting index and string
+ * 
+ *
+ * @note None
+ */
+int MrgSorter::findSpace
+       ( 
+        int bIndex,   // in: start index through string
+        const char *str   // in: string
+       )
+   {
+    while( str[ bIndex ] != SPACE && str[ bIndex ] != NULL_CHAR )
+       {
+        bIndex++;      
+       }
+
+    return bIndex;
+   }
+
+/**
+ * @brief Compares a test name to a specified month name
+ *
+ * @details The first three letters of a test string are compared to
+ *          a given three letter month name
+ *          
+ * @param in: test-month string at starting index
+ * 
+ *
+ * @note Sets all letters to upper case, and is tested against
+ *       an upper case three-letter month
+ * @note first three letters have to be right
+ *       
+ */
+bool MrgSorter::compMonth
+       ( 
+        const char *testStr,  // in: string tested for month
+        int startIndex,  // in: index to start month test
+        const char *testMonth // in: month string to compare to
+       )
+   {
+    int endIndex = startIndex + MONTH_NAME_WIDTH;
+    int testIndex = 0;
+
+    while( startIndex < endIndex )
+       {
+        if( toUpper( testStr[ startIndex ] ) != testMonth[ testIndex ] )
+           {
+            return false;
+           }
+
+        startIndex++; testIndex++;
+       }
+
+    return true;
+   }
+
+/**
+ * @brief Sets lower case to upper case letter
+ *
+ * @details Only operates on lower case letters; all other letters
+ *          are returned unchanged
+ *          
+ * @param in: test character/letter
+ *
+ * @note None
+ */
+char MrgSorter::toUpper
+       ( 
+        char testChar
+       )
+   {
+    if( testChar >= 'a' && testChar <= 'z' )
+       {
+        testChar = char( testChar - 'a' + 'A' );
+       }
+
+    return testChar;
+   }
+
+/**
+ * @brief Verifies character as digit
+ *
+ * @details Checks for character digit between '0' and '9'
+ *          
+ * @param in: test character/letter
+ *
+ * @note None
+ */
+bool MrgSorter::isDigit
+       ( 
+        char testDigit  // in: test character/digit
+       )
+   {
+    return ( testDigit >= '0' && testDigit <= '9' );
+   }
+
+/**
+ * @brief Verifies leap year
+ *
+ * @details Checks for leap year using standard algorithm
+ *          
+ * @param in: year value
+ *
+ * @note None
+ */
+bool MrgSorter::isLeapYear( int year )
+   {
+    return ( year % 4 == 0 && year % 100 != 0 ) || ( year % 400 == 0 );
+   }
+/**
+ * @brief Swaps date types
+ *
+ * @details Swaps date types for use with some sorting algorithms
+ *          
+ * @param in: None
+ *
+ * @note Requires access of vector data, swapping of strings,
+ *       and resetting vector data at locations
+ */
+void MrgSorter::swap
+       ( 
+        int one,   // in: index of one of two to be swapped
+        int other  // in: index other of two to be swapped
+       )
+   {
+    DateType temp, oneDate, otherDate;
+
+    getValueAt( one, oneDate );
+    getValueAt( other, otherDate );
+
+    setValueAt( other, oneDate );
+    setValueAt( one, otherDate );
+   }
+
+#endif // ifndef MRGSORTER_CPP
+
+
+
+
+
