@@ -1,0 +1,72 @@
+// Program Information ////////////////////////////////////////////////////////
+/**
+ * @file SolverClass.h
+ *
+ * @brief Definition file for class that attempts to locate smaller
+ *        inside a larger container rectangle
+ * 
+ * @author Michael Leverington
+ * 
+ * @details Specifies all member methods of the Solver class
+ *
+ * @version 1.00 (18 October 2015)
+ *
+ * @Note None
+ */
+
+// Precompiler directives /////////////////////////////////////////////////////
+
+#ifndef SOLVERCLASS_H
+#define SOLVERCLASS_H
+
+// Header files ///////////////////////////////////////////////////////////////
+
+#include <stdexcept>
+#include "SimpleMatrix.cpp"
+#include "Rectangle.h"
+
+using namespace std;
+
+// Class definition  //////////////////////////////////////////////////////////
+
+class SolverClass
+   {
+    public:
+    
+       // internal constant
+       
+       static const int numLetters = 25;
+
+       // constructor
+       SolverClass();
+
+       // destructor
+       ~SolverClass( );
+
+       // modifiers
+       bool findSolution();
+       bool setContainerRectangle( int height, int width );
+       bool addInsideRectangle( int height, int width );
+       void setDisplayFlag( bool setFlag );
+       void displayField() const;
+
+   private:
+   
+   SimpleMatrix<char> gridSpace;
+   SimpleVector<Rectangle> store;
+   bool display;
+   bool findSolutionHelper();
+   bool isFull();
+   void fill(int row, int col, Rectangle fill);
+   void unfill(char nfill);
+   bool checkForFill(int row, int col, Rectangle fill);
+   bool getNext(int &nextRect);
+   bool checkEmptySpace(int &row, int &col);
+   bool isSolution();
+   };
+
+// Terminating precompiler directives  ////////////////////////////////////////
+
+#endif		// #ifndef SOLVERCLASS_H
+
+
